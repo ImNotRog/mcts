@@ -186,12 +186,13 @@ var MCTSNode = /** @class */ (function () {
     };
     MCTSNode.prototype.expand_children = function () {
         var _this = this;
-        if(!this.children)
+        if(!this.children) {
             this.children = this.game.get_children().map(function (val) {
                 if (val === null)
                     return null;
                 return new MCTSNode(val, _this);
             });
+        }
     };
     MCTSNode.prototype.random_child = function () {
         if (this.children === null)
@@ -203,7 +204,7 @@ var MCTSNode = /** @class */ (function () {
     MCTSNode.prototype.UCB = function () {
         if (this.N === 0)
             return Infinity;
-        return this.Q * -this.game.player / this.N + Math.sqrt(8 * Math.log(this.parent.N) / this.N);
+        return this.Q * -this.game.player / this.N + 6 * Math.sqrt( Math.log(this.parent.N) / this.N);
     };
     MCTSNode.prototype.backprop = function (q) {
         this.N++;
@@ -287,8 +288,8 @@ var MCTS = /** @class */ (function () {
 
 // Actual code starts here
 
-const STEP = 50;
-const MAXITERS = 500;
+const STEP = 200;
+const MAXITERS = 10;
 
 const STATE = {
     iterations: 0,
@@ -305,20 +306,20 @@ self.addEventListener("message", (event) => {
 const main = () => {
 
     if(STATE.move_made.length > 0) {
-        console.log(mcts.root.game.to_string());
-        console.log('SWITCH A')
+        // console.log(mcts.root.game.to_string());
+        // console.log('SWITCH A')
         mcts.move(STATE.move_made[0]);
         STATE.move_made = STATE.move_made.slice(1);
         STATE.iterations = 0;
     }
     else if(STATE.iterations < STEP * MAXITERS) {
-        console.log('SWITCH B')
+        // console.log('SWITCH B')
         for (let j = 0; j < STEP; j++) {
             mcts.iterate();
         }
         STATE.iterations += STEP;
     } else {
-        console.log('SWITCH C')
+        // console.log('SWITCH C')
         setTimeout(() => {
             main();
         }, 200);
@@ -337,7 +338,7 @@ const main = () => {
 
     setTimeout(() => {
         main();
-    }, 1);
+    }, 500);
 }
 
 main();
