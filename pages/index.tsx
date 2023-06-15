@@ -40,6 +40,34 @@ export default function Home() {
   const [game_state, set_game_state] = useState<Connect>( new Connect() );
   const [computation_state, set_computation_state] = useState<ComputationState>( null );
   const [worker, set_worker] = useState<Worker>();
+  const [eval_on, set_eval_on] = useState<boolean>(true);
+  const [auto_p1, set_auto_p1] = useState<boolean>(false);
+  const [auto_p2, set_auto_p2] = useState<boolean>(false);
+
+  const find_best_move = () => {
+    let BEST_MOVE = -1;
+    if (!game_state.is_terminal) {
+      if (computation_state) {
+        let max_i = 0;
+        for (let i = 0; i < computation_state.policy.length; i++) {
+          if (computation_state.policy[i] > computation_state.policy[max_i]) {
+            max_i = i;
+          }
+        }
+        BEST_MOVE = max_i;
+      }
+    }
+    return BEST_MOVE;
+  }
+
+  const MOVE = (i: number) => {
+    if (game_state.is_terminal) return;
+    if (!game_state.get_children()[i]) return;
+
+    worker!.postMessage(i);
+    set_game_state(game_state.get_children()[i]!);
+    set_computation_state({ iterations: 0, policy: Array(game_state.board.length).fill(0), eval: computation_state ? computation_state.eval : 0 });
+  }
 
   useEffect(() => {
 
@@ -62,22 +90,27 @@ export default function Home() {
               eval: res.eval,
               policy: res.policy
             })
+
+            if ((auto_p1 && game_state.player === 1) || (auto_p2 && game_state.player === -1)) {
+              if(res.iterations >= 2000) {
+                if (!game_state.is_terminal) { 
+                  let best_move = 0;
+                  for (let i = 0; i < res.policy.length; i++) {
+                    if (res.policy[i] > res.policy[best_move]) {
+                      best_move = i;
+                    }
+                  }
+                  MOVE(best_move);
+                }
+              }
+            }
           }
 
         }
       }
-  }, [game_state,worker]);
+  }, [game_state,worker,auto_p1,auto_p2]);
 
-  const MOVE = (i: number) => {
-    if (game_state.is_terminal) return;
-    if (!game_state.get_children()[i]) return;
-
-    worker!.postMessage(i);
-    set_game_state(game_state.get_children()[i]!);
-    set_computation_state({iterations:0, policy: Array( game_state.board.length ).fill(0), eval: computation_state ? computation_state.eval : 0 });
-  }
-
-  let BEST_MOVE = -1;
+  let BEST_MOVE = find_best_move();
   let to_place = Array(game_state.board.length).fill(-1);
   if ( !game_state.is_terminal ) {
     for (let i = 0; i < game_state.board.length; i++) {
@@ -90,17 +123,10 @@ export default function Home() {
         j++;
       }
     }
-
-    if(computation_state) {
-      let max_i = 0;
-      for (let i = 0; i < computation_state.policy.length; i++) {
-        if(computation_state.policy[i] > computation_state.policy[max_i]) {
-          max_i = i;
-        }
-      }
-      BEST_MOVE = max_i;
-    }
   }
+
+
+  const eval_style = eval_on ? { } : { opacity: 0 };
 
   return (
     <>
@@ -110,27 +136,31 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className={inter.className}>
+      <main className={mono.className}>
 
         <div className={styles.burrito}>
           <div className={styles.board}>
-            <div className={`${styles.evalburrito} ${game_state.player === 1 ? styles.red : ''}`}>
+            <div style={eval_style} className={`${styles.evalburrito} ${game_state.player === 1 ? styles.red : ''}`}>
               <div className={`${styles.eval} ${game_state.player === -1 ? styles.yellow : ''}`} style={{ height: `${computation_state ? 50*(1-computation_state.eval) : 50}%` }} />
             </div>
             {game_state.board.map((a,i) => 
               <div key={i} className={styles.column}>
 
-                <div className={styles.policy + ' ' + mono.className}>{TRUNCATE(computation_state ? computation_state?.policy[i] : 0)}</div>
+                <div style={eval_style} className={styles.policy + ' ' + mono.className}>{TRUNCATE(computation_state ? computation_state?.policy[i] : 0)}</div>
 
                 {a.map((b,j) => 
-                  <Chip value={b} key={j + '-' + b} to_place={to_place[i] === j} best={BEST_MOVE === i && to_place[i] === j} onClick={() => MOVE(i)} player={game_state.player} />
+                  <Chip value={b} key={j + '-' + b} to_place={to_place[i] === j} best={BEST_MOVE === i && to_place[i] === j && eval_on} onClick={() => MOVE(i)} player={game_state.player} />
                 )}
 
               </div>
             )}
           </div>
-          <div className={mono.className}>Move Confidence</div>
-          <div className={mono.className} style={{marginTop: '1rem'}}>There have been {computation_state ? computation_state.iterations : 0} iterations. (Generally wait until 2000.)</div>
+          <div style={eval_style}>Move Confidence</div>
+          <div style={{marginTop: '1rem'}}>There have been {computation_state ? computation_state.iterations : 0} iterations. (Generally wait until 2000.)</div>
+
+          <div className={styles.lonk} onClick={() => set_eval_on(!eval_on)}>Eval: {eval_on ? 'On' : 'Off'}</div>
+          <div className={styles.lonk} onClick={() => set_auto_p1(!auto_p1)}>Auto Move Player 1 (Red): { auto_p1 ? 'On' : 'Off' }</div>
+          <div className={styles.lonk} onClick={() => set_auto_p2(!auto_p2)}>Auto Move Player 2 (Yellow): {auto_p2 ? 'On' : 'Off'}</div>
         </div>
         
       </main>

@@ -337,7 +337,7 @@ const main = () => {
         iterations: STATE.iterations
     })
 
-    console.log(mcts.root.N);
+    // console.log(mcts.root.N);
 
     requestAnimationFrame(() => {
         main();
