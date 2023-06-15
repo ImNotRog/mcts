@@ -204,7 +204,7 @@ var MCTSNode = /** @class */ (function () {
     MCTSNode.prototype.UCB = function () {
         if (this.N === 0)
             return Infinity;
-        return this.Q * -this.game.player / this.N + 2 * Math.sqrt( Math.log(this.parent.N) / this.N);
+        return this.Q * -this.game.player / this.N + Math.sqrt( 2 * Math.log(this.parent.N) / this.N);
     };
     MCTSNode.prototype.backprop = function (q) {
         this.N++;
