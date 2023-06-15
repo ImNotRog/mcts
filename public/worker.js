@@ -216,8 +216,8 @@ var MCTSNode = /** @class */ (function () {
         var current = this.game;
         while (!current.is_terminal) {
             var children = current.get_children().filter(function (a) { return a !== null; });
-            var goodchildren = children.filter(a => !a.is_terminal || a.value !== -1 * current.player);
-            var bestchildren = goodchildren.filter(a => a.is_terminal && a.value === current.player);
+            var goodchildren = children.filter(a => !a.is_terminal || a.reward !== -1 * current.player);
+            var bestchildren = goodchildren.filter(a => a.is_terminal && a.reward === current.player);
             
             if(bestchildren.length) {
                 current = bestchildren[0];
