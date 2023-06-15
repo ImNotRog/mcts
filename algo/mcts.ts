@@ -10,7 +10,7 @@ export interface Game {
 
 export class Connect implements Game {
     static readonly width = 7;
-    static readonly height = 7;
+    static readonly height = 6;
     static readonly in_a_row = 4;
 
     board: number[][];
@@ -165,10 +165,12 @@ export class MCTSNode {
     }
 
     expand_children(): void {
-        this.children = this.game.get_children().map((val) => {
-            if (val === null) return null;
-            return new MCTSNode(val, this);
-        });
+        if(!this.children) {
+            this.children = this.game.get_children().map((val) => {
+                if (val === null) return null;
+                return new MCTSNode(val, this);
+            });
+        }
     }
 
     random_child() {

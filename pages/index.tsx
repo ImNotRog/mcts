@@ -74,7 +74,7 @@ export default function Home() {
 
     worker!.postMessage(i);
     set_game_state(game_state.get_children()[i]!);
-    set_computation_state(null);
+    set_computation_state({iterations:0, policy: Array( game_state.board.length ).fill(0), eval: computation_state ? computation_state.eval : 0 });
   }
 
   let BEST_MOVE = -1;
@@ -130,7 +130,7 @@ export default function Home() {
             )}
           </div>
           <div className={mono.className}>Move Confidence</div>
-          <div className={mono.className} style={{marginTop: '1rem'}}>There have been {computation_state ? computation_state.iterations : 0} iterations. (Generally wait until 3200.)</div>
+          <div className={mono.className} style={{marginTop: '1rem'}}>There have been {computation_state ? computation_state.iterations : 0} iterations. (Generally wait until 2000.)</div>
         </div>
         
       </main>

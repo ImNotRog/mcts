@@ -164,7 +164,7 @@ var Connect = /** @class */ (function () {
         return "GAME: PLAYER ".concat(this.player === 1 ? 'L' : 'R', " (").concat(this.player, ")\n").concat(this.board.map(function (a) { return a.map(function (b) { return b === 1 ? 'L' : b === 0 ? ' ' : 'R'; }).join(' | '); }).join('\n'));
     };
     Connect.width = 7;
-    Connect.height = 7;
+    Connect.height = 6;
     Connect.in_a_row = 4;
     return Connect;
 }());
