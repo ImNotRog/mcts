@@ -1,0 +1,54 @@
+.board {
+    display: flex;
+    flex-direction: row;
+}
+
+.column {
+    display:flex;
+    flex-direction: column-reverse;
+}
+
+.chip {
+    width: 5rem;
+    height: 5rem;
+    border-radius: 5rem;
+}
+
+.divider {
+    padding: .5rem;
+}
+
+.burrito {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+
+.emptychip {
+    background-color: #00000020;
+}
+
+.red {
+    background-color: #FFBA49;
+}
+
+.yellow {
+    background-color: #EF5B5B;
+}
+
+.emptychiptoplace:not(:hover) {
+    background-color: #00000020;
+}
+
+.best:not(:hover) {
+    background-color: #20A39E50;
+}
+
+.emptychiptoplace:hover {
+    opacity: 50%;
+}
+
+.policy {
+    width: 6rem;
+    text-align: center;
+}

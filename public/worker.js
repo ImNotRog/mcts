@@ -186,11 +186,12 @@ var MCTSNode = /** @class */ (function () {
     };
     MCTSNode.prototype.expand_children = function () {
         var _this = this;
-        this.children = this.game.get_children().map(function (val) {
-            if (val === null)
-                return null;
-            return new MCTSNode(val, _this);
-        });
+        if(!this.children)
+            this.children = this.game.get_children().map(function (val) {
+                if (val === null)
+                    return null;
+                return new MCTSNode(val, _this);
+            });
     };
     MCTSNode.prototype.random_child = function () {
         if (this.children === null)
@@ -202,7 +203,7 @@ var MCTSNode = /** @class */ (function () {
     MCTSNode.prototype.UCB = function () {
         if (this.N === 0)
             return Infinity;
-        return this.Q * -this.game.player / this.N + Math.sqrt(4 * Math.log(this.parent.N) / this.N);
+        return this.Q * -this.game.player / this.N + Math.sqrt(8 * Math.log(this.parent.N) / this.N);
     };
     MCTSNode.prototype.backprop = function (q) {
         this.N++;
@@ -291,23 +292,23 @@ const MAXITERS = 500;
 
 const STATE = {
     iterations: 0,
-    move_made: -1,
+    move_made: [],
 }
 
 console.log('working');
 const mcts = new MCTS(new Connect());
 
 self.addEventListener("message", (event) => { 
-    STATE.move_made = event.data;
+    STATE.move_made.push(event.data);
 });
 
 const main = () => {
 
-    if(STATE.move_made !== -1) {
+    if(STATE.move_made.length > 0) {
         console.log(mcts.root.game.to_string());
         console.log('SWITCH A')
-        mcts.move(STATE.move_made);
-        STATE.move_made = -1;
+        mcts.move(STATE.move_made[0]);
+        STATE.move_made = STATE.move_made.slice(1);
         STATE.iterations = 0;
     }
     else if(STATE.iterations < STEP * MAXITERS) {
@@ -324,17 +325,19 @@ const main = () => {
         return;
     }
 
+    mcts.root.expand_children();
+    if(mcts.root.N === 0) mcts.root.rollout();
     postMessage({
         type: 'computation',
         board: mcts.root.game.board,
-        policy: mcts.root.children.map(child => child.N / mcts.root.N),
+        policy: mcts.root.game.is_terminal ? Array(Connect.width).fill(0) : mcts.root.children.map(child => child ? child.N / mcts.root.N : 0),
         eval: mcts.root.Q / mcts.root.N,
         iterations: STATE.iterations
     })
 
     setTimeout(() => {
         main();
-    }, 100);
+    }, 1);
 }
 
 main();
