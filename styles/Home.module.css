@@ -1,6 +1,7 @@
 .board {
     display: flex;
     flex-direction: row;
+    margin-top: 2rem;
 }
 
 .column {
@@ -28,12 +29,24 @@
     background-color: #00000020;
 }
 
+.evalburrito {
+    width: 1.5rem;
+    background-color: #EBEBEB;
+    margin: 0.5rem 2rem 1.5rem 0rem;
+}
+
+.eval {
+    background-color: #EBEBEB;
+    height: 50%;
+    transition: height .5s ease;
+}
+
 .red {
-    background-color: #FFBA49;
+    background-color: #EF5B5B;
 }
 
 .yellow {
-    background-color: #EF5B5B;
+    background-color: #FFBA49;
 }
 
 .emptychiptoplace:not(:hover) {
@@ -52,3 +65,4 @@
     width: 6rem;
     text-align: center;
 }
+

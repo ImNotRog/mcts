@@ -114,6 +114,9 @@ export default function Home() {
 
         <div className={styles.burrito}>
           <div className={styles.board}>
+            <div className={`${styles.evalburrito} ${game_state.player === 1 ? styles.red : ''}`}>
+              <div className={`${styles.eval} ${game_state.player === -1 ? styles.yellow : ''}`} style={{ height: `${computation_state ? 50*(1-computation_state.eval) : 50}%` }} />
+            </div>
             {game_state.board.map((a,i) => 
               <div key={i} className={styles.column}>
 
@@ -127,11 +130,8 @@ export default function Home() {
             )}
           </div>
           <div className={mono.className}>Move Confidence</div>
+          <div className={mono.className} style={{marginTop: '1rem'}}>There have been {computation_state ? computation_state.iterations : 0} iterations. (Generally wait until 3200.)</div>
         </div>
-        
-        <div>{!!computation_state && computation_state.eval}</div>
-        <div>{!!computation_state && computation_state.policy.map(a => Math.floor(a * 1000)/1000).join(' | ')}</div>
-        <div>{!!computation_state && computation_state.iterations}</div>
         
       </main>
     </>

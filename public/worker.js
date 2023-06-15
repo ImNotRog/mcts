@@ -204,7 +204,7 @@ var MCTSNode = /** @class */ (function () {
     MCTSNode.prototype.UCB = function () {
         if (this.N === 0)
             return Infinity;
-        return this.Q * -this.game.player / this.N + 6 * Math.sqrt( Math.log(this.parent.N) / this.N);
+        return this.Q * -this.game.player / this.N + 2 * Math.sqrt( Math.log(this.parent.N) / this.N);
     };
     MCTSNode.prototype.backprop = function (q) {
         this.N++;
@@ -288,8 +288,9 @@ var MCTS = /** @class */ (function () {
 
 // Actual code starts here
 
-const STEP = 200;
-const MAXITERS = 10;
+const STEP = 20;
+const MAXITERS = 1000;
+// const MAXITERS = 1;
 
 const STATE = {
     iterations: 0,
@@ -336,9 +337,11 @@ const main = () => {
         iterations: STATE.iterations
     })
 
-    setTimeout(() => {
+    console.log(mcts.root.N);
+
+    requestAnimationFrame(() => {
         main();
-    }, 500);
+    });
 }
 
 main();
