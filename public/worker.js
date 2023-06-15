@@ -216,8 +216,20 @@ var MCTSNode = /** @class */ (function () {
         var current = this.game;
         while (!current.is_terminal) {
             var children = current.get_children().filter(function (a) { return a !== null; });
-            var i = Math.floor(Math.random() * children.length);
-            current = children[i];
+            var goodchildren = children.filter(a => !a.is_terminal || a.value !== -1 * current.player);
+            var bestchildren = goodchildren.filter(a => a.is_terminal && a.value === current.player);
+            
+            if(bestchildren.length) {
+                current = bestchildren[0];
+            }
+            else if(goodchildren.length) {
+                var i = Math.floor(Math.random() * goodchildren.length);
+                current = goodchildren[i];
+            } else {
+                var i = Math.floor(Math.random() * children.length);
+                current = children[i];
+            }
+            
         }
         this.backprop(current.reward);
     };
